@@ -1,47 +1,12 @@
-from sqlmodel import SQLModel, Field
-from typing import Optional
-from contextlib import asynccontextmanager
+# accounts/loginauth.py
+import json
+from datetime import datetime, timedelta
 
-class Item(SQModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str
-    description: Optional[str] = None
-    price: float
-    tax: Optional[float] = None
-    
-from sqlmodel import create_engine, Session
+import jwt
+from django.conf import settings
+from django.contrib.auth import authenticate, get_user_model
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+User = get_user_model()
 
-engine = create_engine(sqlite_url, echo=True)
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
-    
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@asynccontextmanager
-async def get_session(app: FastAPI):
-    with Session(engine) as session:
-        yield session
-        
-from fastapi import Depends
-
-@app.post("/items/")
-def create_item(item: Item):
-    with Session(engine) as session:
-        session.add(item)
-        session.commit()
-        session.refresh(item)
-        return item
-    
-from typing import list
-from sqlmodel import select
-@app.get("/items/", response_model=list[Item])
-def read_items():
-    with Session(engine) as session:
-        items = session.exec(select(Item)).all()
-        return items

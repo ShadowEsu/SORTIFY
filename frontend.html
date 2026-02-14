@@ -1,45 +1,68 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sortify | Eco Scanner</title>
+    <title>Sortify | Eco Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <style>
+        :root {
+            --primary: #10b981;
+            --primary-glow: rgba(16, 185, 129, 0.2);
+            --transition-speed: 0.5s;
+        }
+
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #020617;
-            color: white;
-            overflow-x: hidden;
+            font-family: 'Outfit', sans-serif; 
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            -webkit-font-smoothing: antialiased;
         }
-        .logo-font { font-family: 'Orbitron', sans-serif; }
         
-        @keyframes scan {
-            0% { top: 0; opacity: 0.5; }
-            50% { top: 100%; opacity: 1; }
-            100% { top: 0; opacity: 0.5; }
+        .heading-font { 
+            font-family: 'Space Grotesk', sans-serif; 
         }
-        .scan-line {
-            height: 4px;
-            background: linear-gradient(to right, transparent, #22c55e, transparent);
-            box-shadow: 0 0 20px #22c55e;
+
+        @keyframes scan-line-v4 {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .scanner-line {
             position: absolute;
+            left: 0;
             width: 100%;
-            z-index: 20;
-            animation: scan 2s infinite ease-in-out;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary-glow);
+            z-index: 30;
+            animation: scan-line-v4 3s infinite ease-in-out;
         }
-        .glass {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(16px);
+
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        ::-webkit-scrollbar { width: 6px; }
+
+        .light .glass-morphism {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .auth-gradient-bg {
+            background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent),
+                        radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.05), transparent);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
     </style>
 <script type="importmap">
 {
@@ -53,7 +76,7 @@
 }
 </script>
 </head>
-<body>
+<body class="dark">
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
 </body>
