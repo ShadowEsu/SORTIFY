@@ -1,10 +1,12 @@
 import googlemaps
 import json
+import os
+import math
 from dotenv import load_dotenv 
 
 # CONFIGURATION
 load_dotenv()
-API_KEY = 'GOOGLE_MAPS_API_KEY'
+API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 
 def get_coordinates(gmaps, address):
     """Converts a text address into generic latitude/longitude."""
@@ -39,12 +41,18 @@ def find_nearest_facilities(gmaps, location, keywords, radius_meters=5000):
             )
             
             places = []
-            for place in response.get('results', [])[:3]: # Limit to top 3 results per category
+            for place in response.get('results', [])[:3]:
+                place_loc = place.get('geometry', {}).get('location')
+                
+                # Calculate distance using the new function
+                dist = calculate_distance_miles(location, place_loc)
+                
                 places.append({
                     'name': place.get('name'),
                     'address': place.get('vicinity'),
                     'rating': place.get('rating', 'N/A'),
-                    'location': place.get('geometry', {}).get('location')
+                    'location': place_loc,
+                    'distance': round(dist, 2) # Store rounded distance
                 })
             
             results[category] = places
@@ -55,6 +63,25 @@ def find_nearest_facilities(gmaps, location, keywords, radius_meters=5000):
             
     return results
 
+def calculate_distance_miles(origin, destination):
+    """Calculates straight-line distance in miles between two lat/lng points."""
+    if not origin or not destination:
+        return 0
+    
+    # Earth radius in miles
+    R = 3958.8
+    
+    lat1, lon1 = math.radians(origin['lat']), math.radians(origin['lng'])
+    lat2, lon2 = math.radians(destination['lat']), math.radians(destination['lng'])
+    
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    
+    return R * c
+
 def main():
     # 1. Initialize the client
     try:
@@ -64,7 +91,7 @@ def main():
         return
 
     # 2. Define your search center (You can change this to your current location)
-    user_address = "San Francisco, CA" 
+    user_address = "1 N State Dr, San Francisco, CA 94132" 
     print(f"Target Location: {user_address}")
     
     # 3. Get coordinates
@@ -91,6 +118,7 @@ def main():
             for place in places:
                 print(f"  - {place['name']}")
                 print(f"    Addr: {place['address']}")
+                print(f"    Dist: {place['distance']} miles") # <--- NEW LINE
                 print(f"    Rating: {place['rating']}")
 
 if __name__ == "__main__":
